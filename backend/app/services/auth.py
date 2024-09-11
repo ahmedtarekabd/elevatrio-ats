@@ -3,8 +3,8 @@ Authentication routes (JWT, OAuth)
 """
 from datetime import datetime, timezone, timedelta
 from typing import Optional
-from jose import JWTError, jwt
-from fastapi import Depends, HTTPException
+import jwt
+from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 import hashlib
@@ -30,22 +30,28 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
 def verify_access_token(token: str, credentials_exception):
     try:
         payload = jwt.decode(token, config.JWT_SECRET_KEY, algorithms=[config.ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
+        username: str = payload.get("username")
+        email: str = payload.get("email")
+        if username is None or email is None:
             raise credentials_exception
-    except JWTError:
+    except jwt.PyJWTError:
         raise credentials_exception
-    return username
+    return username, email
 
 # Get current user from token
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
-        status_code=401, detail="Could not validate credentials"
+        status_code=status.HTTP_404_NOT_FOUND, detail="Could not validate credentials"
     )
-    username = verify_access_token(token, credentials_exception)
+    print("Token: ", token)
+    username, email  = verify_access_token(token, credentials_exception)
     user = db.query(User).filter(User.username == username).first()
     if user is None:
-        raise credentials_exception
+        user = db.query(User).filter(User.email == email).first()
+    if user is None:
+        raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST, detail="Could not validate credentials"
+    )
     return user
 
 # Hashing functions

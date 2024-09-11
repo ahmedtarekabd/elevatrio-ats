@@ -9,7 +9,21 @@ const config: Config = {
   ],
   mode: "jit",
   theme: {
+    container: {
+      center: true,
+      padding: {
+          DEFAULT: '1rem',
+          sm: '2rem',
+          lg: '4rem',
+          xl: '7rem',
+          '2xl': '7rem',
+      },
+    },
     extend: {
+      height: {
+        'nav': '4rem',
+        'screen-no-nav': 'calc(100vh - 4rem)',
+      },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",

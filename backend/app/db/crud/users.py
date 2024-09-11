@@ -12,7 +12,7 @@ def create_user(db: Session, username: str, email: str, password: str, role: Rol
         role=role,
         full_name=full_name,
     )
-    print(dir(db), type(db))
+
     with next(db) as db:
         db.add(new_user)
         db.commit()

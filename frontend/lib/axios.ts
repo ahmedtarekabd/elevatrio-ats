@@ -3,8 +3,9 @@ import axios, {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from 'axios'
+import { getSession } from 'next-auth/react'
 
-const baseUrl = process.env.BE_BASE_URL
+const baseUrl = process.env.NEXT_PUBLIC_BE_BASE_URL
 console.log(baseUrl)
 
 // Create an instance of Axios with custom configuration
@@ -21,9 +22,9 @@ const axio: AxiosInstance = axios.create({
 
 // Define a request interceptor
 axio.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem('jwt_token')
-    if (token) config.headers.Authorization = `Bearer ${token}`
+  async (config: InternalAxiosRequestConfig) => {
+    const token = await getSession()
+    if (token?.accessToken) config.headers.Authorization = `Bearer ${token?.accessToken}`
     return config
   },
   (error) => {

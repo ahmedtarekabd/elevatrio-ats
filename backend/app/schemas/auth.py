@@ -1,9 +1,16 @@
 from pydantic import BaseModel
 from typing import Optional
 
+class UserAuth(BaseModel):
+    id: int
+    name: str
+    username: str
+    email: str
+    role: str
+
 class Token(BaseModel):
     access_token: str
-    token_type: str
+    user: UserAuth
 
 class TokenData(BaseModel):
     username: Optional[str] = None

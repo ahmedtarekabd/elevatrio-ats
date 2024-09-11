@@ -1,0 +1,80 @@
+# services:
+#   backend:
+#     build: ./backend
+#     ports:
+#       - "8000:8000"
+#     environment:
+#       - DATABASE_URL=postgresql://user:password@db:5432/dbname
+#   frontend:
+#     build: ./frontend
+#     ports:
+#       - "8501:8501"
+#   db:
+#     image: postgres:13
+#     environment:
+#       POSTGRES_USER: user
+#       POSTGRES_PASSWORD: password
+#       POSTGRES_DB: dbname
+#     volumes:
+#       - postgres_data:/var/lib/postgresql/data
+# volumes:
+#   postgres_data:
+
+
+# services:
+#   backend:
+#     build:
+#       context: ./backend
+#       dockerfile: Dockerfile
+#     ports:
+#       - "8000:8000"
+#     volumes:
+#       - ./backend:/app
+#     depends_on:
+#       - db
+
+#   frontend:
+#     build:
+#       context: ./frontend
+#       dockerfile: Dockerfile
+#     ports:
+#       - "8501:8501"
+#     volumes:
+#       - ./frontend:/app
+#     depends_on:
+#       - backend
+
+#   ml_models:
+#     build:
+#       context: ./ml_models
+#       dockerfile: Dockerfile
+#     volumes:
+#       - ./ml_models:/app
+
+#   db:
+#     build:
+#       context: ./db
+#       dockerfile: Dockerfile
+#     ports:
+#       - "5432:5432"
+#     environment:
+#       POSTGRES_USER: admin
+#       POSTGRES_PASSWORD: admin
+#       POSTGRES_DB: hr_database
+#     volumes:
+#       - ./db:/app
+
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+  frontend:
+    build: ./frontend
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./frontend:/app

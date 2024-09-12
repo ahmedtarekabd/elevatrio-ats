@@ -14,15 +14,18 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/hooks/use-toast'
-import axio from '@/lib/axios'
 import { LoginSchema } from '@/schema/authentication'
-import { addToken } from '@/lib/utils'
 import { Loader2 } from 'lucide-react'
 import { signIn } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 const SignInForm = () => {
   const router = useRouter()
+  const searchParams = useSearchParams()
+
+  const callbackURL = searchParams.get('callbackURL') || '/'
+  console.log(callbackURL)
+
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
@@ -32,42 +35,39 @@ const SignInForm = () => {
   })
 
   async function onSubmit(data: z.infer<typeof LoginSchema>) {
-    // const response = await axio.post('/auth/signin', data)
+    // validate the form
+    const validCredentials = LoginSchema.safeParse(data)
+
+    if (!validCredentials.success) {
+      toast({
+        title: 'Error',
+        description: 'Login Failed\n' + validCredentials.error,
+        variant: 'destructive',
+      })
+      return
+    }
+
     const res = await signIn('credentials', {
-      ...form.getValues(),
+      ...validCredentials.data,
       redirect: false,
+      // callbackUrl: callbackURL,
     })
-    // console.log(res)
     if (res?.ok) {
       toast({
         title: 'Success',
         description: 'You have been logged in Successfully',
       })
-      router.push('/')
+      // await waitFor(1000)
+      router.push(callbackURL)
       router.refresh()
     } else {
       console.log(res)
       toast({
         title: 'Error',
         description: 'Login Failed\n' + res?.error,
+        variant: 'destructive',
       })
     }
-    // if (response.status === 200) {
-    //   addToken(response.data)
-    //   toast({
-    //     title: 'Success!',
-    //     description: 'Redirecting to your Dashboard.',
-    //   })
-    //   setTimeout(() => {
-    //     window.location.href = '/dashboard'
-    //   }, 1000)
-    // } else {
-    //   toast({
-    //     title: 'Error',
-    //     description: response.data,
-    //     variant: 'destructive',
-    //   })
-    // }
   }
 
   return (

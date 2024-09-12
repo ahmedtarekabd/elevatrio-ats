@@ -41,7 +41,7 @@ def verify_access_token(token: str, credentials_exception):
 # Get current user from token
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND, detail="Could not validate credentials"
+        status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials"
     )
     print("Token: ", token)
     username, email  = verify_access_token(token, credentials_exception)
@@ -49,9 +49,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     if user is None:
         user = db.query(User).filter(User.email == email).first()
     if user is None:
-        raise HTTPException(
-        status_code=status.HTTP_400_BAD_REQUEST, detail="Could not validate credentials"
-    )
+        raise credentials_exception
     return user
 
 # Hashing functions

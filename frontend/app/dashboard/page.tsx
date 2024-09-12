@@ -1,4 +1,3 @@
-import HRDashboard from '@/components/hr-dashboard'
 import { getServerAuthSession } from '@/server/auth'
 import { redirect } from 'next/navigation'
 
@@ -8,5 +7,5 @@ export default async function HRDashboardPage() {
     const callbackURL = encodeURIComponent('/dashboard') // Replace with the current URL if needed
     redirect(`/signin?callbackURL=${callbackURL}`)
   }
-  return <HRDashboard />
+  return <div className='container flex py-6'>Welcome, HR!</div>
 }

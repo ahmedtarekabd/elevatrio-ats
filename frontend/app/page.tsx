@@ -1,16 +1,12 @@
-import { Button } from "@/components/ui/button";
-import axio from "@/lib/axios";
-import { getServerAuthSession } from "@/server/auth";
-import Link from "next/link";
+import Hero from '@/components/Hero'
+import { getServerAuthSession } from '@/server/auth'
 
 export default async function Home() {
   const session = await getServerAuthSession()
-  console.log("session: ", session)
+  console.log('session: ', session)
   return (
-    <div className="">
-      <Link href="/user">
-        User
-      </Link>
+    <div className='flex h-screen-no-nav items-center justify-center'>
+      <Hero />
     </div>
-  );
+  )
 }

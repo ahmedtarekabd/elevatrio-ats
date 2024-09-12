@@ -18,6 +18,15 @@ class JobTypeEnum(Enum):
     REMOTE = "remote"
     FREELANCER = "freelancer"
 
+class CandidateStatusEnum(Enum):
+    NEW = "new"
+    SCREENING = "screening"
+    SHORTLISTED = "shortlisted"
+    INTERVIEWED = "interviewed"
+    REJECTED = "rejected"
+    OFFER = "offer"
+    HIRED = "hired"
+    
 
 # Models
 class User(Base):
@@ -47,7 +56,8 @@ class Candidate(Base):
     id = Column(Integer, primary_key=True, index=True)
     full_name = Column(String)
     email = Column(String, unique=True, index=True)
-    
+    status = Column(ENUM(CandidateStatusEnum), default=CandidateStatusEnum.NEW, info={"description": "candidate status"})
+
     # Optional fields
     phone = Column(String, nullable=True)
     skills = Column(ARRAY(String), nullable=True,  info={"description": "candidate skills"})

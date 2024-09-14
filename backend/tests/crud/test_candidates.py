@@ -1,8 +1,6 @@
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from datetime import datetime, timezone
-from sqlalchemy.ext.declarative import declarative_base
 from app.db.models import Base
 from app.db.crud.candidates import create_candidate, get_candidate_by_id, update_candidate, delete_candidate
 from app.schemas.candidates import CandidateCreate, CandidateUpdate

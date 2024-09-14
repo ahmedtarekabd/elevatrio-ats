@@ -10,6 +10,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 # Database
 DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_NAME = os.getenv("DATABASE_NAME")
 
 print("Hi: ", os.path.dirname(__file__))
 print("Database: ", DATABASE_URL)

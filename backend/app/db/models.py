@@ -48,7 +48,7 @@ class User(Base):
     )
 
     # Relationships
-    jobs = relationship("Job", back_populates="user")
+    jobs = relationship("Job", backref="user")
 
 class Candidate(Base):
     __tablename__ = "candidates"
@@ -58,12 +58,15 @@ class Candidate(Base):
     email = Column(String, unique=True, index=True)
     status = Column(ENUM(CandidateStatusEnum), default=CandidateStatusEnum.NEW, info={"description": "candidate status"})
 
+    # Relationships
+    job_id = Column(Integer, ForeignKey("jobs.id"), nullable=False, info={"description": "job id"})
+
     # Optional fields
     phone = Column(String, nullable=True)
-    skills = Column(ARRAY(String), nullable=True,  info={"description": "candidate skills"})
-    experience = Column(Integer, nullable=True,  info={"description": "experience in years"})
-    education = Column(String, nullable=True,  info={"description": "education details"})
-    resume = Column(String, nullable=True,  info={"description": "resume file path"})
+    skills = Column(ARRAY(String), nullable=True, info={"description": "candidate skills"})
+    experience = Column(Integer, nullable=True, info={"description": "experience in years"})
+    education = Column(String, nullable=True, info={"description": "education details"})
+    resume = Column(String, nullable=True, info={"description": "resume file path"})
     portfolio = Column(String, nullable=True, info={"description": "portfolio website link"})
     social_links = Column(ARRAY(String), nullable=True, info={"description": "social media links"})
     
@@ -95,9 +98,12 @@ class Job(Base):
         info={"description": "last edited datetime"},
     )
 
+
     # Relationships
     user_id = Column(Integer, ForeignKey("users.id"), info={"description": "user id who created the job"})
-    user = relationship("User", back_populates="jobs")
+        
+    candidates = relationship("Candidate", backref="job") # Add job attribute to Candidate model
+    
     
     # Optional fields
     salary = Column(ARRAY(Float), nullable=True, info={

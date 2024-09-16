@@ -2,13 +2,15 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 from ..db.database import get_db
-from ..db.models import Job, JobTypeEnum
+from ..db.models import Job
 from ..schemas.jobs import JobCreate, JobUpdate, JobResponse, CandidateResponse
 from ..db.crud.jobs import create_job, get_job_by_id, update_job, delete_job
+from app.services.auth import get_current_user
 
 router = APIRouter(
     prefix="/jobs",
     tags=["jobs"],
+    dependencies=[Depends(get_current_user)],
     responses={404: {"description": "Not found"}},
 )
 

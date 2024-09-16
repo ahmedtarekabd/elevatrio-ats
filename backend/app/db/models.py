@@ -116,3 +116,6 @@ class Job(Base):
         "description": "tags/keywords"
     })
 
+    def __repr__(self):
+        return f"<Job {self.title}, {self.candidates}>"
+

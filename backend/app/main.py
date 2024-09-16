@@ -2,11 +2,12 @@ from typing import Annotated
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import users, auth
+from app.routers import users, auth, jobs
 
 from app.db.database import init_db
 
 app = FastAPI()
+app.include_router(jobs.router)
 app.include_router(users.router)
 app.include_router(auth.router)
 

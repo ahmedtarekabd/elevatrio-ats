@@ -25,21 +25,22 @@ class JobUpdate(BaseModel):
     tags: Optional[List[str]] = None
 
 class JobResponse(BaseModel):
-    id: int
+    id: Optional[int]
     title: str
     description: str
     location: str
     job_type: JobTypeEnum
     skills: List[str]
-    created_at: datetime
-    last_edited: datetime
+    created_at: Optional[datetime]
+    last_edited: Optional[datetime]
     user_id: int
     salary: Optional[List[int]] = None
     experience: Optional[List[int]] = None
     tags: Optional[List[str]] = None
+    candidates: Optional[List['CandidateResponse']] = None
 
     class Config:
-        orm_mode: bool = True
+        from_attributes = True
 
 class CandidateResponse(BaseModel):
     id: int
@@ -48,4 +49,4 @@ class CandidateResponse(BaseModel):
     applied_at: datetime
 
     class Config:
-        orm_mode: bool = True
+        from_attributes = True

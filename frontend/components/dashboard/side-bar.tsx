@@ -41,7 +41,9 @@ const SideBar = () => {
   return (
     <div className='flex h-full'>
       <div>
-        <h1 className='mb-6 text-2xl font-bold'>HR Dashboard</h1>
+        <Link href={'/dashboard'}>
+          <h1 className='mb-6 text-2xl font-bold'>HR Dashboard</h1>
+        </Link>
         <NavigationMenu
           orientation='vertical'
           className='items-start justify-start'

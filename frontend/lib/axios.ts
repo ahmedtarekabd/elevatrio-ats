@@ -3,7 +3,7 @@ import axios, {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from 'axios'
-import { getSession } from 'next-auth/react'
+import { getSession, signOut } from 'next-auth/react'
 
 const baseUrl = process.env.NEXT_PUBLIC_BE_BASE_URL
 console.log(baseUrl)
@@ -24,7 +24,8 @@ const axio: AxiosInstance = axios.create({
 axio.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
     const token = await getSession()
-    if (token?.accessToken) config.headers.Authorization = `Bearer ${token?.accessToken}`
+    if (token?.accessToken)
+      config.headers.Authorization = `Bearer ${token?.accessToken}`
     return config
   },
   (error) => {
@@ -36,7 +37,10 @@ axio.interceptors.request.use(
 // Define a response interceptor
 axio.interceptors.response.use(
   (response: AxiosResponse) => {
-    // You can modify the response data here (e.g., transform the data)
+    if (response.status === 401) {
+      // Handle unauthorized
+      signOut()
+    }
     return response
   },
   (error) => {

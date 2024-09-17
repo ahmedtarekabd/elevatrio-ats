@@ -28,7 +28,15 @@ export function formatText(text: string, maxLength: number = 12) {
   return text
 }
 
-export function formatDate(date_string: string) {
+export const formatDate = (date: Date) => {
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+}
+
+export function formatDateAsDuration(date_string: string) {
   const now = new Date()
   const date = new Date(date_string)
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)

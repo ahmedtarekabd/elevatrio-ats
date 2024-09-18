@@ -46,7 +46,9 @@ const FormSchema = z.object({
   job_type: z
     .string()
     .min(2, { message: 'Job type must be at least 2 characters.' }),
-  skills: z.string(),
+  skills: z
+    .string()
+    .min(1, { message: 'Skills must have at least one skill.' }),
   salary: z.string(),
   experience: z.string(),
   tags: z.string(),

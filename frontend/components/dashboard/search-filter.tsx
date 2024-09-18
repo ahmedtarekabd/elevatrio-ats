@@ -94,7 +94,12 @@ const SearchFilter = () => {
           </TableHeader>
           <TableBody>
             {filteredCandidates.map((candidate) => (
-              <TableRow key={candidate.id}>
+              <TableRow
+                key={candidate.id}
+                onClick={() => {
+                  window.location.href = `/dashboard/candidates/${candidate.id}`
+                }}
+              >
                 <TableCell>{candidate.name}</TableCell>
                 <TableCell>{candidate.jobTitle}</TableCell>
                 <TableCell>{candidate.score}</TableCell>

@@ -1,10 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, File, UploadFile
 from sqlalchemy.orm import Session
 from typing import List
 from app.db.database import get_db
 from app.db.models import Candidate
 from app.schemas.candidates import CandidateCreate, CandidateUpdate, CandidateResponse, CandidateSearchRequest
 from app.db.crud.candidates import create_candidate, get_candidate_by_id, update_candidate, delete_candidate
+import shutil
+from pathlib import Path
+
 
 router = APIRouter(
     prefix="/candidates",
@@ -12,9 +15,15 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-@router.post("/", response_model=CandidateResponse, status_code=status.HTTP_201_CREATED)
-def create_new_candidate(candidate: CandidateCreate, db: Session = Depends(get_db)):
-    return create_candidate(db, candidate)
+# async def create_new_candidate(resumes: List[UploadFile]=File(...), db: Session = Depends(get_db)):
+@router.post("/upload-resumes", status_code=status.HTTP_201_CREATED)
+async def create_new_candidate(resumes: List[UploadFile]=File(...), db: Session = Depends(get_db)):
+    path = Path() / "app" / "db" / "files"
+    for resume in resumes:
+        file_location = path / resume.filename.replace(' ', '_')
+        with open(file_location, "wb+") as file_object:
+            shutil.copyfileobj(resume.file, file_object)
+            print(f"File {resume.filename} saved to {file_location}")
 
 @router.get("/{candidate_id}", response_model=CandidateResponse)
 def read_candidate(candidate_id: int, db: Session = Depends(get_db)):

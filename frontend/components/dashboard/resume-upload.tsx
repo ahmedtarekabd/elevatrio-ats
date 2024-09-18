@@ -7,22 +7,45 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { CheckCircle2, File, Upload } from 'lucide-react'
+import { CheckCircle2, File, Upload, XCircle } from 'lucide-react'
 import React, { useCallback, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
+import axio from '@/lib/axios'
+
+type UploadedFile = {
+  name: string
+  size: number
+}
 
 const ResumeUpload = () => {
-  interface UploadedFile {
-    name: string;
-    size: number;
-  }
-  
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
-  const onDrop = useCallback((acceptedFiles: File[]) => {
+  const [uploadProgress, setUploadProgress] = useState<number | null>(0)
+
+  const onDrop = useCallback(async (acceptedFiles: File[]) => {
+    const filesForm = new FormData()
+    setUploadedFiles([])
+    acceptedFiles.forEach((file) => {
+      console.log(file.name)
+      filesForm.append('resumes', file)
+    })
     setUploadedFiles((prevFiles) => [
       ...prevFiles,
-      ...acceptedFiles.map((file: File) => ({ name: file.name, size: file.size })),
+      ...acceptedFiles.map((file: File) => ({
+        name: file.name,
+        size: file.size,
+      })),
     ])
+    const res = await axio.post('/candidates/upload-resumes', filesForm, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      onUploadProgress(progressEvent) {
+        setUploadProgress(
+          Math.round((progressEvent.loaded * 100) / progressEvent.total!),
+        )
+      },
+    })
+    if (res.status >= 300) {
+      setUploadProgress(null)
+    }
   }, [])
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -35,6 +58,7 @@ const ResumeUpload = () => {
     },
     multiple: true,
   })
+
   return (
     <div>
       <Card>
@@ -74,7 +98,20 @@ const ResumeUpload = () => {
                     <span className='text-sm text-muted-foreground'>
                       ({(file.size / 1024 / 1024).toFixed(2)} MB)
                     </span>
-                    <CheckCircle2 className='ml-auto h-5 w-5 text-green-500' />
+                    {uploadProgress &&
+                      (uploadProgress === 100 ? (
+                        <CheckCircle2 className='ml-auto h-5 w-5 text-green-500' />
+                      ) : (
+                        <span className='ml-auto text-sm text-muted-foreground'>
+                          {uploadProgress}%
+                        </span>
+                      ))}
+                    {!uploadProgress && (
+                      <div className='flex items-center gap-1 text-red-500'>
+                        <XCircle className='ml-auto h-5 w-5' />
+                        An error occurred
+                      </div>
+                    )}
                   </li>
                 ))}
               </ul>

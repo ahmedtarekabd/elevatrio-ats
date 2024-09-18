@@ -1,11 +1,12 @@
 export type CandidateStatusEnum =
-  | 'pending'
-  | 'approved'
-  | 'rejected'
+  | 'new'
+  | 'screening'
+  | 'interview'
+  | 'offer'
   | 'hired'
-  | 'archived'
+  | 'rejected'
 
-export type Candidates = {
+export type Candidate = {
   id?: number
   full_name: string
   email: string

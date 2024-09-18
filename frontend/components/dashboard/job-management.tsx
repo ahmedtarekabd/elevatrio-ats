@@ -70,11 +70,17 @@ const JobManagement = () => {
     onError: (error) => console.error('Error deleting job:', error),
   })
 
-  const { data, isLoading, isFetching, isError, refetch } = useQuery({
+  const {
+    data: jobs,
+    isLoading,
+    isFetching,
+    isError,
+    refetch,
+  } = useQuery<Job[]>({
     queryKey: ['jobs'],
-    queryFn: () => axio.get('/jobs/'),
+    queryFn: async () => (await axio.get('/jobs/')).data,
   })
-  const jobs: Job[] = data?.data
+  // const jobs: Job[] = data?.data
   console.log('jobs:', jobs)
 
   return (
@@ -128,6 +134,7 @@ const JobManagement = () => {
               </TableHeader>
               <TableBody>
                 {jobs &&
+                  jobs.length > 0 &&
                   jobs.map((job) => (
                     <TableRow key={job.id}>
                       <TableCell>{job.title}</TableCell>
@@ -170,13 +177,24 @@ const JobManagement = () => {
                       Loading...
                     </TableCell>
                   </TableRow>
+                ) : !jobs || jobs.length === 0 ? (
+                  <TableRow>
+                    <TableCell className='text-center font-bold' colSpan={4}>
+                      No jobs found
+                    </TableCell>
+                  </TableRow>
                 ) : (
-                  (!jobs || jobs.length === 0) && (
-                    <TableRow>
-                      <TableCell className='text-center font-bold' colSpan={4}>
-                        No jobs found
-                      </TableCell>
-                    </TableRow>
+                  isError && (
+                    <>
+                      <TableRow>
+                        <TableCell
+                          className='text-center font-bold'
+                          colSpan={4}
+                        >
+                          An Error Occurred. Please try again later.
+                        </TableCell>
+                      </TableRow>
+                    </>
                   )
                 )}
               </TableBody>

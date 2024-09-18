@@ -73,3 +73,6 @@ Thumbs.db
 # Streamlit-specific files
 .streamlit/secrets.toml
 .streamlit/config.toml
+
+# Blob storage
+files/

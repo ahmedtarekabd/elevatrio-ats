@@ -37,8 +37,8 @@ const FormSchema = z.object({
     .min(10, {
       message: 'Description must be at least 10 characters.',
     })
-    .max(160, {
-      message: 'Description must not be longer than 30 characters.',
+    .max(300, {
+      message: 'Description must not be longer than 300 characters.',
     }),
   location: z
     .string()
@@ -52,22 +52,6 @@ const FormSchema = z.object({
   salary: z.string(),
   experience: z.string(),
   tags: z.string(),
-  // skills: z
-  //   .array(z.string(), {
-  //     message: 'Skills must be an list of strings.',
-  //   })
-  //   .min(1, { message: 'Skills must have at least one skill.' }),
-  // salary: z.array(z.string(), {
-  //   message: 'Salary must be an list of strings.',
-  // }),
-  // experience: z
-  //   .array(z.string(), {
-  //     message: 'Experience must be an list of strings.',
-  //   })
-  //   .min(1, { message: 'Experience must have at least one experience.' }),
-  // tags: z
-  //   .array(z.string(), { message: 'Tags must be an list of strings.' })
-  //   .min(1, { message: 'Tags must have at least one tag.' }),
 })
 
 type FormSchemaType = z.infer<typeof FormSchema>

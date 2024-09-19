@@ -1,9 +1,10 @@
 import PyPDF2
 import docx
 import spacy
-import os
 import re
 import json
+import os
+from pathlib import Path
 
 # Text extraction functions
 def extract_text_from_pdf(file_path):
@@ -19,24 +20,60 @@ def extract_text_from_docx(file_path):
     return '\n'.join([para.text for para in doc.paragraphs])
 
 # Information extraction functions
-email_pattern = r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+'
-phone_pattern = r'(\+?\d{1,2}\s?)?(\(?\d{3}\)?[\s.-]?)?\d{3}[\s.-]?\d{4}'
-education_pattern = "education|academic background|qualifications?"
-experience_pattern = "experience|work history|employment history|intern.*"
-skills_pattern = "skills?|technical skills?|professional skills?"
-certifications_pattern = "certifications?|certificates?|awards?|courses"
-projects_pattern = "projects?|portfolio|work samples?"
-languages_pattern = "languages?|spoken languages"
-patterns = [education_pattern, experience_pattern, skills_pattern, certifications_pattern, projects_pattern, languages_pattern, email_pattern, phone_pattern]
+# The patterns are used to identify the start of each section in the resume
+# Note: We add \s at the end of some patterns to avoid matching with similar words, ex: "intern" and "intern"ational
+email_pattern = {
+    "label": "email",
+    "pattern": r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+'
+}
+phone_pattern = {
+    "label": "phone",
+    "pattern": r'(\+?\d{1,2}\s?)?(\(?\d{3}\)?[\s.-]?)?\d{3}[\s.-]?\d{4}'
+}
+overview_pattern = {
+    "label": "overview",
+    "pattern": "overview\s|summary\s|objectives?\s|about me\s|profile\s|bio\s|personal statement\s",
+}
+education_pattern = {
+    "label": "education",
+    "pattern": "education\s|academic background\s|qualifications?\s",
+}
+experience_pattern = {
+    "label": "experience",
+    "pattern": "experience\s|expertise\s|work history\s|employment history\s|interns?\s|internships?\s",
+}
+skills_pattern = {
+    "label": "skills",
+    "pattern": "skills?\s|tools?\s",
+}
+certifications_pattern = {
+    "label": "certifications",
+    "pattern": "certificat?|awards?\s|courses?\s",
+}
+projects_pattern = {
+    "label": "projects",
+    "pattern": "projects?|portfolio|work samples?|achievements?",
+}
+languages_pattern = {
+    "label": "languages",
+    "pattern": "languages?|spoken languages",
+}
+patterns = [overview_pattern, education_pattern, experience_pattern, skills_pattern, certifications_pattern, projects_pattern, languages_pattern, email_pattern, phone_pattern]
+
+def extract_name(doc):
+    for ent in doc.ents:
+        if ent.label_ == 'PERSON':
+            return ent.text
+    return None
 
 def extract_email(text):
-    match = re.search(email_pattern, text)
+    match = re.search(email_pattern['pattern'], text)
     if match:
         return match.group(0)
     return None
 
 def extract_phone(text):
-    match = re.search(phone_pattern, text)
+    match = re.search(phone_pattern['pattern'], text)
     if match:
         return match.group(0)
     return None
@@ -82,66 +119,89 @@ def extract_links(text):
         links = [''.join(match) for match in matches if match[-1]] # Only keep full matches (aka. with path: https://www.example.com/path)
     return links
 
+def extract_sections(resume_data, paragraphs):
+    prev_section = None
+    for i, paragraph in enumerate(paragraphs):
+        # print(paragraph.replace('\n', ' ')) # Print the paragraph without newlines
+        current_section = None
+        for pattern in patterns:
+            if re.search(pattern['pattern'], paragraph[:30], re.IGNORECASE):
+                # print(f"Pattern: {pattern['pattern']} found in paragraph {i}, label: {pattern['label']}, paragraph[:30]: {paragraph[:30]}")
+                current_section = pattern['label']
+                prev_section = pattern['label']
+                if current_section not in resume_data or not resume_data[current_section]:
+                    resume_data[current_section] = paragraph
+                else: 
+                    resume_data[current_section] += paragraph
+                break
+        if not current_section and prev_section: 
+            resume_data[prev_section] += paragraph
+    return resume_data
 
-def extract_info_from_text(text):
+def extract_info_from_text(text: str, paragraphs: list[str]):
     resume_data = {
         'name': '',
         'email': '',
         'phone': '',
+        'overview': '',
+        'experience': '',
+        'education': '',
+        'certifications': '',
+        'projects': '',
         'skills': [],
-        'experience': [],
-        'education': [],
-        'certifications': [],
-        'projects': [],
         'languages': [],
         'links': []
     }
 
     nlp = spacy.load('en_core_web_lg')
     doc = nlp(text)
-    # entities = [ent.label_ for ent in doc.ents]
-    for ent in doc.ents:
-        if ent.label_ == 'PERSON' and ~len(resume_data['name']):
-            resume_data['name'] = ent.text
-            break
-    
+
+    resume_data = extract_sections(resume_data, paragraphs)
+    # Regex
+    resume_data['name'] = extract_name(doc)
     resume_data['email'] = extract_email(text)
     resume_data['phone'] = extract_phone(text)
-    resume_data['experience'] = extract_experience(text)
-    resume_data['education'] = extract_education(text)
-    resume_data['certifications'] = extract_certifications(text)
-    resume_data['projects'] = extract_projects(text)
-    resume_data['languages'] = extract_languages(text)
     resume_data['links'] = extract_links(text)
+    resume_data['languages'] = extract_languages(text)
 
-    relative_path = os.path.dirname(__file__)
-    with open(relative_path + '\\resumes\\output\\output.html', 'w') as file:
+    relative_path = Path() / 'app/testing/output/output.html'
+    with open(relative_path, 'w') as file:
         file.write(spacy.displacy.render(doc, style='ent'))
 
     return resume_data
 
 def parse_resume(file_path):
     text = ""
-    if file_path.endswith('.pdf'):
+    if str(file_path).endswith('.pdf'):
         text = extract_text_from_pdf(file_path)
-    elif file_path.endswith('.docx'):
+    elif str(file_path).endswith('.docx'):
         text = extract_text_from_docx(file_path)
     else:
         raise ValueError('Unsupported file format')
     
-    resume_data = extract_info_from_text(text)
-    # TODO: Use an LLM(Llama 3.1) model to extract information more accuratly from the resume
+    text = re.sub('[ ]+', ' ', text) # Remove extra spaces
+    text = re.sub(r'[^\x00-\x7F]+', '', text) # Remove symbols
+    paragraphs = re.split(r'\n\s*\n', text) # Split text into paragraphs
+    with open(relative_path / 'output/paragraphs.json', 'w') as file:
+        json.dump(paragraphs, file, indent=4)
+
+    text = ' '.join(paragraphs)
+    resume_data = extract_info_from_text(text, paragraphs)
 
     return resume_data
 
-if __name__ == '__main__':
-    relative_path = os.path.dirname(__file__)
-    resume_file_pdf = relative_path + '\\resumes\\Ahmed Tarek Resume.pdf'
-    resume_file_pdf = relative_path + '\\resumes\\Haitham_Ibrahim-CV.pdf'
+# TODO: Use an LLM model to extract information more accuratly from the resume
+def extract_info_from_text_using_llm(text: str):
+    pass
 
-    resume_file_docx = relative_path + '\\resumes\\Ahmed Tarek Resume.docx'
+if __name__ == '__main__':
+    relative_path = Path() / "app/testing/"
+
+    resume_file_pdf = relative_path / 'Haitham_Ibrahim-CV.pdf'
+    resume_file_pdf = relative_path / 'Ahmed Tarek Resume.pdf'
+    resume_file_docx = relative_path / 'Ahmed Tarek Resume.docx'
     
     resume_data = parse_resume(resume_file_pdf)
-    with open(relative_path + '\\resumes\\output\\output.json', 'w') as file:
+    with open(relative_path / 'output/output.json', 'w') as file:
         json.dump(resume_data, file, indent=4)
     # print(resume_data)

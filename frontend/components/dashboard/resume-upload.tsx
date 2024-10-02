@@ -11,6 +11,7 @@ import { CheckCircle2, File, Upload, XCircle } from 'lucide-react'
 import React, { useCallback, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import axio from '@/lib/axios'
+import { toast } from '@/hooks/use-toast'
 
 type UploadedFile = {
   name: string
@@ -44,7 +45,16 @@ const ResumeUpload = () => {
       },
     })
     if (res.status >= 300) {
-      setUploadProgress(null)
+      // console.log(res)
+      if (res.data.detail) {
+        toast({
+          title: 'Opps',
+          description: res.data.detail,
+          variant: 'destructive',
+        })
+      } else {
+        setUploadProgress(null)
+      }
     }
   }, [])
 

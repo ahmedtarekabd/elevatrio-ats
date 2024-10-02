@@ -5,8 +5,11 @@ import re
 import json
 import os
 from pathlib import Path
+from pydantic import BaseModel
+from typing import List
 
-# Text extraction functions
+
+#* Text extraction functions
 def extract_text_from_pdf(file_path):
     with open(file_path, 'rb') as file:
         reader = PyPDF2.PdfReader(file)
@@ -19,7 +22,8 @@ def extract_text_from_docx(file_path):
     doc = docx.Document(file_path)
     return '\n'.join([para.text for para in doc.paragraphs])
 
-# Information extraction functions
+
+#* Information extraction functions
 # The patterns are used to identify the start of each section in the resume
 # Note: We add \s at the end of some patterns to avoid matching with similar words, ex: "intern" and "intern"ational
 email_pattern = {
@@ -46,8 +50,8 @@ skills_pattern = {
     "label": "skills",
     "pattern": "skills?\s|tools?\s",
 }
-certifications_pattern = {
-    "label": "certifications",
+certificates_pattern = {
+    "label": "certificates",
     "pattern": "certificat?|awards?\s|courses?\s",
 }
 projects_pattern = {
@@ -58,7 +62,13 @@ languages_pattern = {
     "label": "languages",
     "pattern": "languages?|spoken languages",
 }
-patterns = [overview_pattern, education_pattern, experience_pattern, skills_pattern, certifications_pattern, projects_pattern, languages_pattern, email_pattern, phone_pattern]
+extracurricular_pattern = {
+    "label": "extracurricular",
+    "pattern": "extra|volunteer|activities|hobbies|interests",
+}
+patterns = [overview_pattern, education_pattern, experience_pattern, skills_pattern,
+            certificates_pattern, projects_pattern, languages_pattern, email_pattern, 
+            phone_pattern, extracurricular_pattern]
 
 def extract_name(doc):
     for ent in doc.ents:
@@ -78,45 +88,16 @@ def extract_phone(text):
         return match.group(0)
     return None
 
-def extract_section(text, section_name, next_sections):
-    # Build the regex pattern dynamically based on the section name and next sections
-    pattern = rf'(?i)({section_name})(.*?)(?=\n(?:{"|".join(next_sections)}))'
-    
-    match = re.search(pattern, text, re.DOTALL)
-    if match:
-        return match.group(2).strip()  # Group 2 contains the text of the matched section
-    return None
-
-def extract_certifications(text):
-    section = patterns.copy()
-    section.remove(certifications_pattern)
-    return extract_section(text, certifications_pattern, section)
-
-def extract_education(text):
-    section = patterns.copy()
-    section.remove(education_pattern)
-    return extract_section(text, education_pattern, section)
-
-def extract_experience(text):
-    section = patterns.copy()
-    section.remove(experience_pattern)
-    return extract_section(text, experience_pattern, section)
-
-def extract_projects(text):
-    section = patterns.copy()
-    section.remove(projects_pattern)
-    return extract_section(text, projects_pattern, section)
-
 def extract_languages(text):
     languages_list = ['English', 'Spanish', 'French', 'German', 'Chinese', 'Arabic']
     return [language for language in languages_list if language.lower() in text.lower()]
 
 def extract_links(text):
     links = []
-    link_pattern = r'(?:https?://)?(\w+\.)?(.+\.com+)+(\.\w+)?(/\S+)?' # Matches links with www or subdomains
+    link_pattern = r'(?:\w+\s+)?(?:https?://)?(\w+\.)?(.+\.\w+)+(\.\w+)?(/\S+)?' # Matches links with www or subdomains
     matches = re.findall(link_pattern, text)
     if matches:
-        links = [''.join(match) for match in matches if match[-1]] # Only keep full matches (aka. with path: https://www.example.com/path)
+        links = [re.sub('\s+', '',''.join(match)) for match in matches if match[-1]] # Only keep full matches (aka. with path: https://www.example.com/path)
     return links
 
 def extract_sections(resume_data, paragraphs):
@@ -138,6 +119,14 @@ def extract_sections(resume_data, paragraphs):
             resume_data[prev_section] += paragraph
     return resume_data
 
+def clean_flatten_text(text: str) -> list[str]:
+    """
+    Clean the text by removing extra spaces and newlines, bullet points, then flatten it into a list of strings
+    """
+    list = map(lambda item: re.split(r'\s*,\s*', item), re.split(r'\s*\n\s*', text))
+    list = [re.sub('^o ', '', item) for sublist in list for item in sublist if item]
+    return list
+
 def extract_info_from_text(text: str, paragraphs: list[str]):
     resume_data = {
         'name': '',
@@ -146,31 +135,50 @@ def extract_info_from_text(text: str, paragraphs: list[str]):
         'overview': '',
         'experience': '',
         'education': '',
-        'certifications': '',
+        'certificates': '',
         'projects': '',
-        'skills': [],
+        'skills': '',
+        'links': [],
         'languages': [],
-        'links': []
+        'extracurricular': '',
     }
+
+    print(text)
 
     nlp = spacy.load('en_core_web_lg')
     doc = nlp(text)
 
-    resume_data = extract_sections(resume_data, paragraphs)
     # Regex
+    resume_data = extract_sections(resume_data, paragraphs)
+
     resume_data['name'] = extract_name(doc)
     resume_data['email'] = extract_email(text)
     resume_data['phone'] = extract_phone(text)
     resume_data['links'] = extract_links(text)
+    resume_data['skills'] = clean_flatten_text(resume_data['skills'])
     resume_data['languages'] = extract_languages(text)
 
-    relative_path = Path() / 'app/testing/output/output.html'
-    with open(relative_path, 'w') as file:
-        file.write(spacy.displacy.render(doc, style='ent'))
+    # relative_path = Path() / 'app/testing/output/output.html'
+    # with open(relative_path, 'w') as file:
+    #     file.write(spacy.displacy.render(doc, style='ent'))
 
     return resume_data
 
-def parse_resume(file_path):
+class ResumeData(BaseModel):
+    name: str
+    email: str
+    phone: str
+    overview: str
+    experience: str
+    education: str
+    certificates: str
+    projects: str
+    skills: List[str]
+    links: List[str]
+    languages: List[str]
+    extracurricular: str
+
+def parse_resume(file_path) -> ResumeData:
     text = ""
     if str(file_path).endswith('.pdf'):
         text = extract_text_from_pdf(file_path)
@@ -181,6 +189,7 @@ def parse_resume(file_path):
     
     text = re.sub('[ ]+', ' ', text) # Remove extra spaces
     text = re.sub(r'[^\x00-\x7F]+', '', text) # Remove symbols
+    text = re.sub(r'_+', '', text) # Remove symbols
     paragraphs = re.split(r'\n\s*\n', text) # Split text into paragraphs
     with open(relative_path / 'output/paragraphs.json', 'w') as file:
         json.dump(paragraphs, file, indent=4)
@@ -198,8 +207,13 @@ if __name__ == '__main__':
     relative_path = Path() / "app/testing/"
 
     resume_file_pdf = relative_path / 'Haitham_Ibrahim-CV.pdf'
+    resume_file_pdf = relative_path / 'Mostafa Mohamed Resume.pdf'
+    resume_file_pdf = relative_path / 'Modern nursing resume.pdf'
     resume_file_pdf = relative_path / 'Ahmed Tarek Resume.pdf'
     resume_file_docx = relative_path / 'Ahmed Tarek Resume.docx'
+    resume_file_docx = relative_path / 'Modern nursing resume.docx'
+    resume_file_docx = relative_path / 'cv-marwan-osama.docx'
+    resume_file_docx = relative_path / 'Bold attorney resume.docx'
     
     resume_data = parse_resume(resume_file_pdf)
     with open(relative_path / 'output/output.json', 'w') as file:

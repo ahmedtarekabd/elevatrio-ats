@@ -5,6 +5,9 @@ from enum import Enum
 from datetime import datetime, timezone
 from sqlalchemy.dialects.postgresql import ENUM
 
+# drop table alembic_version, candidates, jobs, users;
+# drop type candidatestatusenum, jobtypeenum, roleenum;	
+
 # Enums
 class RoleEnum(Enum):
     ADMIN = "admin"
@@ -59,16 +62,20 @@ class Candidate(Base):
     status = Column(ENUM(CandidateStatusEnum), default=CandidateStatusEnum.NEW, info={"description": "candidate status"})
 
     # Relationships
-    job_id = Column(Integer, ForeignKey("jobs.id"), nullable=False, info={"description": "job id"})
+    job_id = Column(Integer, ForeignKey("jobs.id"), nullable=True, info={"description": "job id"})
 
     # Optional fields
     phone = Column(String, nullable=True)
     skills = Column(ARRAY(String), nullable=True, info={"description": "candidate skills"})
-    experience = Column(Integer, nullable=True, info={"description": "experience in years"})
+    years_experience = Column(Integer, nullable=True, info={"description": "experience in years"})
+    experience = Column(String, nullable=True, info={"description": "experience"})
+    overview = Column(String, nullable=True, info={"description": "overview or summary of candidate"})
     education = Column(String, nullable=True, info={"description": "education details"})
+    certificates = Column(String, nullable=True, info={"description": "certifications"})
     resume = Column(String, nullable=True, info={"description": "resume file path"})
-    portfolio = Column(String, nullable=True, info={"description": "portfolio website link"})
-    social_links = Column(ARRAY(String), nullable=True, info={"description": "social media links"})
+    links = Column(ARRAY(String), nullable=True, info={"description": "links"})
+    languages = Column(ARRAY(String), nullable=True, info={"description": "languages"})
+    extracurricular = Column(String, nullable=True, info={"description": "extra curricular activities"})
     
     created_at = Column(DateTime, default=datetime.now(timezone.utc), nullable=False, info={"description": "creation datetime"})    
     last_edited = Column(

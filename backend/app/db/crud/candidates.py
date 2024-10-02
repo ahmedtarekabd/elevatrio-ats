@@ -10,12 +10,15 @@ def create_candidate(db: Session, candidate: CandidateCreate):
         full_name=candidate.full_name,
         email=candidate.email,
         phone=candidate.phone,
-        skills=candidate.skills,
+        overview=candidate.overview,
         experience=candidate.experience,
         education=candidate.education,
+        certificates=candidate.certificates,
+        skills=candidate.skills,
         resume=candidate.resume,
-        portfolio=candidate.portfolio,
-        social_links=candidate.social_links,
+        links=candidate.links,
+        languages=candidate.languages,
+        extracurricular=candidate.extracurricular,
         created_at=datetime.now(timezone.utc),
         last_edited=datetime.now(timezone.utc)
     )

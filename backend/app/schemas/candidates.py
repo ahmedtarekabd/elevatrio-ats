@@ -16,24 +16,28 @@ class CandidateResponse(BaseModel):
     experience: Optional[int] = None
     education: Optional[str] = None
     resume: Optional[str] = None
-    portfolio: Optional[str] = None
-    social_links: Optional[List[str]] = None
+    links: Optional[List[str]] = None
     created_at: datetime
     last_edited: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class CandidateCreate(BaseModel):
     full_name: str
     email: str
     phone: Optional[str] = None
+    overview: Optional[str] = None
     skills: Optional[List[str]] = None
-    experience: Optional[int] = None
+    experience: Optional[str] = None
     education: Optional[str] = None
+    certificates: Optional[str] = None
+    projects: Optional[str] = None
+    skills: Optional[List[str]] = None
     resume: Optional[str] = None
-    portfolio: Optional[str] = None
-    social_links: Optional[List[str]] = None
+    links: Optional[List[str]] = None
+    languages: Optional[List[str]] = None
+    extracurricular: Optional[str] = None
 
 class CandidateUpdate(BaseModel):
     full_name: Optional[str] = None
@@ -43,5 +47,4 @@ class CandidateUpdate(BaseModel):
     experience: Optional[int] = None
     education: Optional[str] = None
     resume: Optional[str] = None
-    portfolio: Optional[str] = None
-    social_links: Optional[List[str]] = None
+    links: Optional[List[str]] = None

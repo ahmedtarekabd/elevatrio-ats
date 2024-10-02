@@ -14,6 +14,7 @@ def get_db():
     finally:
         db.close()
 
+# Do not call it if using Alembic
 def init_db():
     # with engine.connect() as connection:
     #     connection.execute(text("commit"))

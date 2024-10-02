@@ -1,29 +1,40 @@
-from fastapi import APIRouter, Depends, HTTPException, status, File, UploadFile
+from fastapi import APIRouter, Depends, HTTPException, status, File, UploadFile, BackgroundTasks
 from sqlalchemy.orm import Session
 from typing import List
 from app.db.database import get_db
-from app.db.models import Candidate
+from app.db.models import User, Candidate
 from app.schemas.candidates import CandidateCreate, CandidateUpdate, CandidateResponse, CandidateSearchRequest
 from app.db.crud.candidates import create_candidate, get_candidate_by_id, update_candidate, delete_candidate
-import shutil
+from app.services.background_tasks.candidate import create_candidate_from_resume
+from app.services.auth import get_current_user
 from pathlib import Path
+import shutil
 
 
 router = APIRouter(
     prefix="/candidates",
     tags=["candidates"],
+    dependencies=[Depends(get_current_user)],
     responses={404: {"description": "Not found"}},
 )
 
-# async def create_new_candidate(resumes: List[UploadFile]=File(...), db: Session = Depends(get_db)):
 @router.post("/upload-resumes", status_code=status.HTTP_201_CREATED)
-async def create_new_candidate(resumes: List[UploadFile]=File(...), db: Session = Depends(get_db)):
-    path = Path() / "app" / "db" / "files"
+async def create_new_candidate(resumes: List[UploadFile]=File(...), authUser: User = Depends(get_current_user), background_tasks: BackgroundTasks = None):
+    path = Path() / "app" / "db" / "files" / f"{authUser.id}"
+    path.mkdir(parents=True, exist_ok=True)
+    rejected_files = []
     for resume in resumes:
+        if not resume.filename.endswith('.pdf') and not resume.filename.endswith('.docx'):
+            rejected_files.append(resume.filename)
+            continue
         file_location = path / resume.filename.replace(' ', '_')
         with open(file_location, "wb+") as file_object:
             shutil.copyfileobj(resume.file, file_object)
-            print(f"File {resume.filename} saved to {file_location}")
+            # Add the processing task to the background tasks
+            background_tasks.add_task(create_candidate_from_resume, file_location)
+
+    if rejected_files:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Some files were rejected: {rejected_files}")
 
 @router.get("/{candidate_id}", response_model=CandidateResponse)
 def read_candidate(candidate_id: int, db: Session = Depends(get_db)):

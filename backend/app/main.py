@@ -22,4 +22,5 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
-init_db()
+# # Do not call it if using Alembic!!
+# init_db()

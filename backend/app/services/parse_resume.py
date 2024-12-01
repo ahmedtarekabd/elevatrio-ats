@@ -1,5 +1,5 @@
 import PyPDF2
-import docx
+import docx, docx2txt
 import spacy
 import re
 import json
@@ -19,9 +19,8 @@ def extract_text_from_pdf(file_path):
     return text
 
 def extract_text_from_docx(file_path):
-    doc = docx.Document(file_path)
-    return '\n'.join([para.text for para in doc.paragraphs])
-
+    text = docx2txt.process(file_path)
+    return text
 
 #* Information extraction functions
 # The patterns are used to identify the start of each section in the resume
@@ -32,7 +31,7 @@ email_pattern = {
 }
 phone_pattern = {
     "label": "phone",
-    "pattern": r'(\+?\d{1,2}\s?)?(\(?\d{3}\)?[\s.-]?)?\d{3}[\s.-]?\d{4}'
+    "pattern": r'(\+?\d{1,2}\s?)?(\(?\d{3}\)?[\s.-]+)?\d{3}[\s.-]+\d{4}'
 }
 overview_pattern = {
     "label": "overview",
@@ -116,7 +115,7 @@ def extract_sections(resume_data, paragraphs):
                     resume_data[current_section] += paragraph
                 break
         if not current_section and prev_section: 
-            resume_data[prev_section] += paragraph
+            resume_data[prev_section] += ' ' + paragraph
     return resume_data
 
 def clean_flatten_text(text: str) -> list[str]:
@@ -124,8 +123,18 @@ def clean_flatten_text(text: str) -> list[str]:
     Clean the text by removing extra spaces and newlines, bullet points, then flatten it into a list of strings
     """
     list = map(lambda item: re.split(r'\s*,\s*', item), re.split(r'\s*\n\s*', text))
-    list = [re.sub('^o ', '', item) for sublist in list for item in sublist if item]
+    list = [re.sub('\bo\b', '', item) for sublist in list for item in sublist if item]
     return list
+
+def clean_text(text: str) -> str:
+    """
+    Clean the text by removing extra spaces and newlines, bullet points.
+    """
+    text = re.sub('[ ]+', ' ', text) # Remove extra spaces
+    text = re.sub(r'[^\x00-\x7F]+', '', text) # Remove symbols
+    text = re.sub(r'_+', '', text) # Remove symbols
+    text = re.sub(r'\bo\b', '', text) # Remove bullet points
+    return text
 
 def extract_info_from_text(text: str, paragraphs: list[str]):
     resume_data = {
@@ -143,7 +152,7 @@ def extract_info_from_text(text: str, paragraphs: list[str]):
         'extracurricular': '',
     }
 
-    print(text)
+    # print(text)
 
     nlp = spacy.load('en_core_web_lg')
     doc = nlp(text)
@@ -187,9 +196,7 @@ def parse_resume(file_path) -> ResumeData:
     else:
         raise ValueError('Unsupported file format')
     
-    text = re.sub('[ ]+', ' ', text) # Remove extra spaces
-    text = re.sub(r'[^\x00-\x7F]+', '', text) # Remove symbols
-    text = re.sub(r'_+', '', text) # Remove symbols
+    text = clean_text(text)
     paragraphs = re.split(r'\n\s*\n', text) # Split text into paragraphs
     with open(relative_path / 'output/paragraphs.json', 'w') as file:
         json.dump(paragraphs, file, indent=4)
@@ -211,11 +218,12 @@ if __name__ == '__main__':
     resume_file_pdf = relative_path / 'Modern nursing resume.pdf'
     resume_file_pdf = relative_path / 'Ahmed Tarek Resume.pdf'
     resume_file_docx = relative_path / 'Ahmed Tarek Resume.docx'
-    resume_file_docx = relative_path / 'Modern nursing resume.docx'
     resume_file_docx = relative_path / 'cv-marwan-osama.docx'
+    resume_file_docx = relative_path / 'Table.docx'
+    resume_file_docx = relative_path / 'Modern nursing resume.docx'
     resume_file_docx = relative_path / 'Bold attorney resume.docx'
     
-    resume_data = parse_resume(resume_file_pdf)
+    resume_data = parse_resume(resume_file_docx)
     with open(relative_path / 'output/output.json', 'w') as file:
         json.dump(resume_data, file, indent=4)
     # print(resume_data)

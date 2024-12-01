@@ -5,7 +5,7 @@ from app.db.database import get_db
 from app.db.models import User, Candidate
 from app.schemas.candidates import CandidateCreate, CandidateUpdate, CandidateResponse, CandidateSearchRequest
 from app.db.crud.candidates import create_candidate, get_candidate_by_id, update_candidate, delete_candidate
-from app.services.background_tasks.candidate import create_candidate_from_resume
+from app.services.background_tasks.candidate import create_candidate_from_resume, score_candidate
 from app.services.auth import get_current_user
 from pathlib import Path
 import shutil
@@ -32,6 +32,9 @@ async def create_new_candidate(resumes: List[UploadFile]=File(...), authUser: Us
             shutil.copyfileobj(resume.file, file_object)
             # Add the processing task to the background tasks
             background_tasks.add_task(create_candidate_from_resume, file_location)
+            # TODO: Add a task to classify the resume according to the job description
+            # Add the scoring task to the background tasks
+            background_tasks.add_task(score_candidate)
 
     if rejected_files:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Some files were rejected: {rejected_files}")

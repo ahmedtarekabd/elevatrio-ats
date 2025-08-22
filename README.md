@@ -1,301 +1,364 @@
-### Project Structure
+# AI-Driven Hiring Platform (ATS)
 
-Here's a recommended project structure for your FastAPI backend, Streamlit frontend, and the associated ML models:
+A modern, intelligent Applicant Tracking System built with FastAPI backend, Next.js frontend, and machine learning models for automated resume parsing and candidate matching.
+
+## 🚀 Features
+
+### Core Functionality
+- **Smart Resume Parsing**: AI-powered extraction of candidate information from various resume formats
+- **Intelligent Job Matching**: ML-based algorithms to match candidates with job requirements
+- **HR Dashboard**: Comprehensive interface for managing candidates, jobs, and hiring pipeline
+- **Secure Authentication**: JWT-based authentication system with role-based access control
+- **Real-time Analytics**: Hiring metrics, candidate statistics, and performance insights
+
+### Advanced Features (Planned)
+- **Interview Intelligence**: Real-time AI analysis during interviews
+  - Sentiment analysis (confident, nervous, engaged)
+  - Dynamic question recommendations based on job requirements
+  - Conversation flow insights and candidate assessment
+- **Automated Screening**: Pre-screening candidates based on customizable criteria
+- **Integration APIs**: Connect with popular HR tools and platforms
+
+## 🏗️ Architecture
+
+### Technology Stack
+
+**Backend**
+- **FastAPI**: Modern, fast web framework with automatic API documentation
+- **PostgreSQL**: Robust relational database for data persistence
+- **SQLAlchemy**: Python ORM for database operations
+- **Alembic**: Database migration management
+- **Python 3.10+**: Core programming language
+
+**Frontend**
+- **Next.js 14**: React framework with App Router and server-side rendering
+- **TypeScript**: Type-safe JavaScript for better development experience
+- **Tailwind CSS**: Utility-first CSS framework for rapid UI development
+- **React Hook Form**: Performant forms with easy validation
+
+**Machine Learning**
+- **Python ML Stack**: scikit-learn, pandas, numpy for data processing
+- **NLP Libraries**: spaCy, NLTK, or Transformers for text processing
+- **Jupyter Notebooks**: Model experimentation and development
+
+**DevOps**
+- **Docker**: Containerization for consistent environments
+- **Docker Compose**: Multi-container application orchestration
+
+## 📁 Project Structure
 
 ```
-├── project_root/
-│   ├── backend/                # FastAPI Backend
-│   │   ├── app/
-│   │   │   ├── api/            # FastAPI API routes
-│   │   │   │   ├── auth.py     # Authentication routes (JWT, OAuth)
-│   │   │   │   ├── candidates.py  # Candidate management routes
-│   │   │   │   ├── jobs.py     # Job management routes
-│   │   │   │   ├── dashboard.py # HR dashboard routes
-│   │   │   ├── core/
-│   │   │   │   ├── config.py   # Configuration (DB, secret keys)
-│   │   │   │   ├── security.py # JWT auth logic
-|   |   |   |   ├── db/ # Database migrations and setup
-|   |   |   |   │   ├── migrations/ # Alembic for DB migrations
-|   |   |   |   │   ├── models.sql # Schema setup
-|   |   |   |   │   ├── db_seed.py  # Scripts to seed the database
-|   |   |   |   │   └── database.py # Database connection logic
-│   │   │   ├── models/         # ORM models (SQLAlchemy)
-│   │   │   │   ├── candidate.py # Candidate DB model
-│   │   │   │   ├── job.py      # Job DB model
-│   │   │   │   ├── user.py     # User/HR DB model
-│   │   │   ├── services/       # Services (Business Logic)
-│   │   │   │   ├── parse_resume.py # CV parsing logic
-│   │   │   │   ├── ml_matching.py  # ML model for matching candidates
-│   │   │   ├── main.py         # Entry point for FastAPI backend
-│   │   ├── tests/              # Test suite (Pytest)
-│   │   ├── requirements.txt    # Python dependencies for backend
-│   │   └── Dockerfile          # Dockerfile for backend
+ATS/
+├── backend/                    # FastAPI Backend
+│   ├── app/                   # Main application code
+│   │   ├── api/              # API routes and endpoints
+│   │   ├── core/             # Configuration and security
+│   │   ├── models/           # SQLAlchemy ORM models
+│   │   ├── services/         # Business logic layer
+│   │   └── main.py           # FastAPI application entry point
+│   ├── tests/                # Test suite (Pytest)
+│   ├── alembic.ini           # Database migration configuration
+│   ├── requirements.txt      # Python dependencies
+│   ├── Dockerfile           # Container configuration
+│   └── .env                 # Environment variables
 │
-├── frontend/                   # Streamlit Frontend
-│   ├── pages/                  # Streamlit multi-page app structure
-│   │   ├── dashboard.py        # HR dashboard with job/candidate views
-│   │   ├── candidate_view.py   # Candidate profile view
-│   │   ├── job_opportunities.py # Job postings management
-│   ├── components/             # Reusable components (cards, forms)
-│   ├── streamlit_auth.py       # Streamlit authentication logic
-│   ├── app.py                  # Main entry point for Streamlit app
-│   ├── requirements.txt        # Python dependencies for frontend
-│   └── Dockerfile              # Dockerfile for frontend
+├── frontend/                  # Next.js Frontend
+│   ├── app/                  # Next.js App Router pages
+│   ├── components/           # Reusable React components
+│   ├── hooks/               # Custom React hooks
+│   ├── lib/                 # Utility functions and configurations
+│   ├── schema/              # TypeScript schemas and validation
+│   ├── server/              # Server-side utilities
+│   ├── types/               # TypeScript type definitions
+│   ├── package.json         # Node.js dependencies
+│   ├── next.config.mjs      # Next.js configuration
+│   ├── tailwind.config.ts   # Tailwind CSS configuration
+│   ├── tsconfig.json        # TypeScript configuration
+│   ├── Dockerfile           # Container configuration
+│   ├── .env.development     # Development environment variables
+│   └── .env.production      # Production environment variables
 │
-├── ml_models/                  # ML models directory
-│   ├── nlp_model.py            # NLP model for resume parsing
-│   ├── scoring_model.py        # ML model for resume matching
-│   └── train_model.py          # Scripts to train and evaluate models
+├── ml_models/                 # Machine Learning Models
+│   ├── nlp_model.py          # NLP model for resume parsing
+│   ├── experimental.ipynb    # Jupyter notebook for experiments
+│   ├── Dockerfile           # Container configuration
+│   └── models/              # Trained model files (not in git)
 │
-├── docker-compose.yml           # Docker Compose for multi-container setup
-├── README.md                   # Project overview and setup instructions
-└── .env                        # Environment variables (DB credentials, API keys)
+├── docker-compose.yml         # Multi-container orchestration
+├── ATS.code-workspace        # VS Code workspace configuration
+├── .gitignore               # Git ignore rules
+└── README.md                # This file
 ```
 
-### Explanation of the Structure
+## 🚦 Quick Start
 
-1. **Backend (FastAPI)**
+### Prerequisites
 
-   - **`app/api`**: Holds the API routes (job management, candidate management, etc.).
-   - **`app/core`**: Configuration files and security logic (like JWT tokens).
-   - **`app/models`**: SQLAlchemy models representing database entities (jobs, candidates, users).
-   - **`app/services`**: Business logic for parsing resumes, managing jobs, and running ML models.
-   - **`main.py`**: The entry point for starting the FastAPI server.
+- **Docker & Docker Compose**: For containerized development
+- **Node.js 18+**: For local frontend development
+- **Python 3.10+**: For local backend development
+- **PostgreSQL**: Database (handled by Docker in development)
 
-2. **Frontend (Streamlit)**
+### 🐳 Running with Docker (Recommended)
 
-   - **`pages/`**: Each page in the Streamlit dashboard (HR dashboard, candidate profile, job management).
-   - **`components/`**: Reusable UI components (cards, forms).
-   - **`streamlit_auth.py`**: Handles authentication for the HR dashboard.
-   - **`app.py`**: Main entry point for running the Streamlit frontend.
+1. **Clone the repository**
+```bash
+git clone https://github.com/ahmedtarekabd/elevatrio-ats.git
+cd elevatrio-ats
+```
 
-3. **ML Models**
+2. **Start all services**
+```bash
+docker-compose up --build
+```
 
-   - **`nlp_model.py`**: Parses resumes using NLP libraries like `spaCy` or `Transformers`.
-   - **`scoring_model.py`**: Matches candidates to job descriptions using algorithms like logistic regression, clustering, or deep learning.
-   - **`train_model.py`**: Scripts to train and tune your ML models.
+3. **Access the applications**
+   - **Frontend**: http://localhost:8501
+   - **Backend API**: http://localhost:8000
+   - **API Documentation**: http://localhost:8000/docs
+   - **API Redoc**: http://localhost:8000/redoc
 
-4. **Database**
+### 🔧 Local Development Setup
 
-   - **`migrations/`**: Handles database migrations using Alembic.
-   - **`db_seed.py`**: Seeds initial data into the database.
-   - **`database.py`**: Contains the logic to connect to the database using SQLAlchemy.
+#### Backend Development
 
-5. **Docker & Environment Files**
-   - **`Dockerfile`**: Separate Dockerfiles for both backend (FastAPI) and frontend (Streamlit).
-   - **`docker-compose.yml`**: Orchestrates the backend, frontend, and database services using Docker Compose.
-   - **`.env`**: Stores sensitive information like database credentials, API keys, etc.
+```bash
+cd backend
 
----
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Windows: .\venv\Scripts\activate
 
-### Deployment Plan
+# Install dependencies
+pip install -r requirements.txt
 
-#### 1. **Dockerization**
+# Set up environment variables
+cp .env.example .env  # Edit with your settings
 
-Docker is ideal for containerizing your backend, frontend, and database services, ensuring consistent environments across development and production.
+# Run database migrations
+alembic upgrade head
 
-- **Backend Dockerfile (FastAPI)**:
+# Start development server
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
 
-  ```dockerfile
-  # Use Python 3.10.6 as the base image
-  FROM python:3.10.6-slim
+#### Frontend Development
 
-  # Set the working directory
-  WORKDIR /app
+```bash
+cd frontend
 
-  # Copy the requirements file
-  COPY requirements.txt .
+# Install dependencies
+npm install
 
-  # Install dependencies
-  RUN pip install --no-cache-dir -r requirements.txt
+# Set up environment variables
+cp .env.development.example .env.development  # Edit with your settings
 
-  # Copy the application code
-  COPY . .
+# Start development server
+npm run dev
+```
 
-  # Expose the FastAPI port
-  EXPOSE 8000
+## 🔐 Environment Configuration
 
-  # Run the FastAPI application
-  CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
-  ```
+### Backend (.env)
+```env
+# Database
+DATABASE_URL=postgresql://user:password@localhost:5432/ats_db
 
-- **Frontend Dockerfile (Streamlit)**:
+# Security
+SECRET_KEY=your-super-secret-key-here
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
 
-  ```dockerfile
-  # Use Python 3.10.6 as the base image
-  FROM python:3.10.6-slim
+# External APIs
+OPENAI_API_KEY=your-openai-key  # For AI features
+```
 
-  # Set the working directory
-  WORKDIR /app
+### Frontend (.env.development)
+```env
+# API Configuration
+NEXT_PUBLIC_API_URL=http://localhost:8000
+NEXT_PUBLIC_APP_ENV=development
 
-  # Copy the requirements file
-  COPY requirements.txt .
+# Authentication
+NEXTAUTH_SECRET=your-nextauth-secret
+NEXTAUTH_URL=http://localhost:8501
+```
 
-  # Install dependencies
-  RUN pip install --no-cache-dir -r requirements.txt
+## 📊 Database Management
 
-  # Copy the application code
-  COPY . .
+### Running Migrations
 
-  # Expose the Streamlit port
-  EXPOSE 8501
+```bash
+cd backend
 
-  # Run the Streamlit app
-  CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
-  ```
+# Create a new migration
+alembic revision --autogenerate -m "Description of changes"
 
-- **`docker-compose.yml`**:
-  ```yaml
-  version: "3"
-  services:
-    backend:
-      build: ./backend
-      ports:
-        - "8000:8000"
-      environment:
-        - DATABASE_URL=postgresql://user:password@db:5432/dbname
-    frontend:
-      build: ./frontend
-      ports:
-        - "8501:8501"
-    db:
-      image: postgres:13
-      environment:
-        POSTGRES_USER: user
-        POSTGRES_PASSWORD: password
-        POSTGRES_DB: dbname
-      volumes:
-        - postgres_data:/var/lib/postgresql/data
-  volumes:
-    postgres_data:
-  ```
+# Apply migrations
+alembic upgrade head
 
-#### 2. **Cloud Deployment Options**
+# Rollback migration
+alembic downgrade -1
+```
 
-You can use services like AWS, Azure, or Google Cloud to deploy your containers.
+### Database Seeding
 
-- **AWS ECS / Fargate**: For containerized applications, AWS Fargate allows you to deploy your containers without managing servers.
-- **Google Cloud Run**: A fully managed platform that automatically scales your containers.
-- **Azure Container Instances**: Run your Docker containers in Azure without managing complex infrastructure.
+```bash
+cd backend
+python -m app.db.db_seed
+```
 
-**Steps:**
+## 🧪 Testing
 
-1. **Set up a Cloud Account**: AWS, Google Cloud, or Azure.
-2. **Push Images to a Container Registry**: After building your Docker images, push them to a container registry (e.g., AWS ECR, Docker Hub, or Google Container Registry).
-   ```bash
-   docker build -t <your_image_name> .
-   docker tag <your_image_name> <registry_url>/<your_image_name>
-   docker push <registry_url>/<your_image_name>
-   ```
-3. **Deploy with Cloud Services**: Create container services in the cloud provider and link them with the respective container registry.
+### Backend Tests
 
-#### 3. **CI/CD Pipeline**
+```bash
+cd backend
+pytest tests/ -v
+```
 
-Use GitHub Actions, GitLab CI, or CircleCI to automate testing, building, and deploying your project.
+### Frontend Tests
 
-- **Testing**: Run automated tests using `pytest` for the backend and Streamlit.
-- **Build**: Ensure Docker containers are built correctly.
-- **Deploy**: Automatically deploy the latest version to your cloud provider.
+```bash
+cd frontend
+npm test
+```
 
-Example GitHub Actions Workflow:
+## 📖 API Documentation
+
+Once the backend is running, visit:
+- **Swagger UI**: http://localhost:8000/docs
+- **ReDoc**: http://localhost:8000/redoc
+
+### Key API Endpoints
+
+- **Authentication**: `/auth/login`, `/auth/register`
+- **Jobs**: `/jobs/`, `/jobs/{id}`
+- **Candidates**: `/candidates/`, `/candidates/{id}`
+- **Resume Upload**: `/candidates/upload-resume`
+- **Job Matching**: `/matching/candidates/{job_id}`
+
+## 🚀 Deployment
+
+### Production Docker Build
+
+```bash
+# Build production images
+docker-compose -f docker-compose.prod.yml build
+
+# Deploy with production configuration
+docker-compose -f docker-compose.prod.yml up -d
+```
+
+### Cloud Deployment Options
+
+1. **AWS ECS/Fargate**: Serverless container deployment
+2. **Google Cloud Run**: Fully managed container platform
+3. **Azure Container Instances**: Scalable container hosting
+4. **DigitalOcean App Platform**: Simple container deployment
+
+### CI/CD Pipeline Example (GitHub Actions)
 
 ```yaml
 name: CI/CD Pipeline
 on:
   push:
-    branches:
-      - main
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.10
-      - name: Install dependencies
-        run: pip install -r backend/requirements.txt
+      - uses: actions/checkout@v3
       - name: Run backend tests
-        run: pytest backend/tests
-      - name: Build Docker images
-        run: docker-compose build
-      - name: Push Docker images
-        run: docker-compose push
-      - name: Deploy to cloud
-        run: # Add cloud deployment steps here
+        run: |
+          cd backend
+          pip install -r requirements.txt
+          pytest
+      - name: Run frontend tests
+        run: |
+          cd frontend
+          npm install
+          npm test
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy to production
+        run: |
+          # Add deployment steps here
+          echo "Deploying to production..."
 ```
 
-By following this structure and deployment plan, you’ll have a scalable, containerized AI-driven hiring platform ready for production.
+## 🤝 Contributing
 
----
+1. **Fork the repository**
+2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
+3. **Commit your changes**: `git commit -m 'Add amazing feature'`
+4. **Push to the branch**: `git push origin feature/amazing-feature`
+5. **Open a Pull Request**
 
-To run both the **FastAPI** and **Streamlit** applications simultaneously, especially in the context of your Docker setup, follow these steps:
+### Development Guidelines
 
-# 1. Running Locally Without Docker
-If you want to run both applications on your local machine without Docker, follow this approach:
+- Follow PEP 8 for Python code
+- Use ESLint and Prettier for TypeScript/JavaScript code
+- Write tests for new features
+- Update documentation as needed
+- Follow conventional commit messages
 
-## Step 1: Start FastAPI Backend
-1. Make sure you're in the backend folder of your project.
-2. Activate the virtual environment (assuming you're using a virtual environment):
+## 📝 Code Quality
+
+### Backend
+- **Linting**: `flake8`, `black`
+- **Type Checking**: `mypy`
+- **Testing**: `pytest`
+
+### Frontend
+- **Linting**: ESLint
+- **Formatting**: Prettier
+- **Type Checking**: TypeScript compiler
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+1. **Database Connection Errors**
+   - Ensure PostgreSQL is running
+   - Check DATABASE_URL in .env file
+   - Verify database credentials
+
+2. **Frontend Can't Connect to Backend**
+   - Verify NEXT_PUBLIC_API_URL in frontend environment
+   - Check if backend is running on correct port
+   - Ensure CORS is properly configured
+
+3. **Docker Issues**
+   - Run `docker-compose down && docker-compose up --build`
+   - Check Docker daemon is running
+   - Verify port availability
+
+### Logs and Debugging
+
 ```bash
-  source venv/bin/activate  # On Linux or macOS
-  # OR
-  .\venv\Scripts\activate  # On Windows
-  Run FastAPI with uvicorn:
+# View container logs
+docker-compose logs backend
+docker-compose logs frontend
+
+# Follow logs in real-time
+docker-compose logs -f backend
 ```
-3. Run FastAPI with uvicorn:
-```bash
-  uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-This will start the FastAPI application at http://localhost:8000.
 
-## Step 2: Start Streamlit Frontend
-1. In a new terminal window, navigate to your frontend folder.
-2. Activate the virtual environment if you haven't already:
-```bash
-  source venv/bin/activate  # On Linux or macOS
-  # OR
-  .\venv\Scripts\activate  # On Windows
-```
-3. Run Streamlit:
-```bash
-  streamlit run app.py
-```
-This will start the Streamlit frontend at http://localhost:8501.
+## 📄 License
 
-# 2. Running With Docker Compose
-If you're using Docker Compose (as per the docker-compose.yml provided earlier), follow these steps to run both applications simultaneously using containers.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Step 1: Build and Run Docker Containers
-1. Navigate to the root of your project directory (where docker-compose.yml is located).
+## 🙏 Acknowledgments
 
-2. Build and start the containers:
-
-```bash
-   docker-compose up --build
-```
-  This command will build both the backend and frontend containers, then start them. FastAPI will be available at http://localhost:8000 and Streamlit at http://localhost:8501.
-
-- The --build flag ensures that any changes to the Dockerfiles are considered during the build process.
-
-3. You should now have both FastAPI (backend) and Streamlit (frontend) running together.
-
-## Step 2: Verify
-- Go to http://localhost:8501 to access the Streamlit frontend.
-- Streamlit will interact with FastAPI running at http://localhost:8000.
-
-# 3. Troubleshooting
-- If you're unable to access the applications, make sure there are no firewall restrictions or port conflicts.
-- If you're modifying the code and using Docker, remember to re-run docker-compose up --build to rebuild the containers with updated code.
-
----
-
-# Extra Features
-
-## Interview feedback
-
-- During the interview the model can listen to the conversation and give real-time feeback to the HR
-  - Give insights on how the candidate's feel (normal, nervous, etc.)
-  - Recommend questions related to the job position
+- FastAPI for the excellent Python web framework
+- Next.js team for the React framework
+- OpenAI for AI/ML capabilities
+- The open-source community for various libraries and tools

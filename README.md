@@ -5,6 +5,7 @@ A modern, intelligent Applicant Tracking System built with FastAPI backend, Next
 ## 🚀 Features
 
 ### Core Functionality
+
 - **Smart Resume Parsing**: AI-powered extraction of candidate information from various resume formats
 - **Intelligent Job Matching**: ML-based algorithms to match candidates with job requirements
 - **HR Dashboard**: Comprehensive interface for managing candidates, jobs, and hiring pipeline
@@ -12,6 +13,7 @@ A modern, intelligent Applicant Tracking System built with FastAPI backend, Next
 - **Real-time Analytics**: Hiring metrics, candidate statistics, and performance insights
 
 ### Advanced Features (Planned)
+
 - **Interview Intelligence**: Real-time AI analysis during interviews
   - Sentiment analysis (confident, nervous, engaged)
   - Dynamic question recommendations based on job requirements
@@ -24,6 +26,7 @@ A modern, intelligent Applicant Tracking System built with FastAPI backend, Next
 ### Technology Stack
 
 **Backend**
+
 - **FastAPI**: Modern, fast web framework with automatic API documentation
 - **PostgreSQL**: Robust relational database for data persistence
 - **SQLAlchemy**: Python ORM for database operations
@@ -31,17 +34,23 @@ A modern, intelligent Applicant Tracking System built with FastAPI backend, Next
 - **Python 3.10+**: Core programming language
 
 **Frontend**
-- **Next.js 14**: React framework with App Router and server-side rendering
+
+- **Next.js 14**: (Requires update for Known security vulnerabilities) React framework with App Router and server-side rendering
 - **TypeScript**: Type-safe JavaScript for better development experience
 - **Tailwind CSS**: Utility-first CSS framework for rapid UI development
+- **Shadcn UI**: Pre-built UI components for faster development
 - **React Hook Form**: Performant forms with easy validation
+- **NextAuth.js**: Authentication for Next.js applications
+- **Axios**: Promise-based HTTP client for API requests
 
 **Machine Learning**
+
 - **Python ML Stack**: scikit-learn, pandas, numpy for data processing
 - **NLP Libraries**: spaCy, NLTK, or Transformers for text processing
 - **Jupyter Notebooks**: Model experimentation and development
 
 **DevOps**
+
 - **Docker**: Containerization for consistent environments
 - **Docker Compose**: Multi-container application orchestration
 
@@ -102,21 +111,29 @@ ATS/
 ### 🐳 Running with Docker (Recommended)
 
 1. **Clone the repository**
+
 ```bash
 git clone https://github.com/ahmedtarekabd/elevatrio-ats.git
 cd elevatrio-ats
 ```
 
 2. **Start all services**
+
 ```bash
 docker-compose up --build
 ```
 
 3. **Access the applications**
+
    - **Frontend**: http://localhost:8501
    - **Backend API**: http://localhost:8000
    - **API Documentation**: http://localhost:8000/docs
-   - **API Redoc**: http://localhost:8000/redoc
+
+4. **Stop services**
+
+```bash
+docker-compose down
+```
 
 ### 🔧 Local Development Setup
 
@@ -157,33 +174,6 @@ cp .env.development.example .env.development  # Edit with your settings
 npm run dev
 ```
 
-## 🔐 Environment Configuration
-
-### Backend (.env)
-```env
-# Database
-DATABASE_URL=postgresql://user:password@localhost:5432/ats_db
-
-# Security
-SECRET_KEY=your-super-secret-key-here
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-
-# External APIs
-OPENAI_API_KEY=your-openai-key  # For AI features
-```
-
-### Frontend (.env.development)
-```env
-# API Configuration
-NEXT_PUBLIC_API_URL=http://localhost:8000
-NEXT_PUBLIC_APP_ENV=development
-
-# Authentication
-NEXTAUTH_SECRET=your-nextauth-secret
-NEXTAUTH_URL=http://localhost:8501
-```
-
 ## 📊 Database Management
 
 ### Running Migrations
@@ -208,27 +198,11 @@ cd backend
 python -m app.db.db_seed
 ```
 
-## 🧪 Testing
-
-### Backend Tests
-
-```bash
-cd backend
-pytest tests/ -v
-```
-
-### Frontend Tests
-
-```bash
-cd frontend
-npm test
-```
-
 ## 📖 API Documentation
 
 Once the backend is running, visit:
+
 - **Swagger UI**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
 
 ### Key API Endpoints
 
@@ -313,52 +287,17 @@ jobs:
 ## 📝 Code Quality
 
 ### Backend
-- **Linting**: `flake8`, `black`
-- **Type Checking**: `mypy`
+
+- Future: **Linting**: `flake8`, `black`
+- Future: **Type Checking**: `mypy`
 - **Testing**: `pytest`
 
 ### Frontend
+
 - **Linting**: ESLint
 - **Formatting**: Prettier
 - **Type Checking**: TypeScript compiler
 
-## 🐛 Troubleshooting
-
-### Common Issues
-
-1. **Database Connection Errors**
-   - Ensure PostgreSQL is running
-   - Check DATABASE_URL in .env file
-   - Verify database credentials
-
-2. **Frontend Can't Connect to Backend**
-   - Verify NEXT_PUBLIC_API_URL in frontend environment
-   - Check if backend is running on correct port
-   - Ensure CORS is properly configured
-
-3. **Docker Issues**
-   - Run `docker-compose down && docker-compose up --build`
-   - Check Docker daemon is running
-   - Verify port availability
-
-### Logs and Debugging
-
-```bash
-# View container logs
-docker-compose logs backend
-docker-compose logs frontend
-
-# Follow logs in real-time
-docker-compose logs -f backend
-```
-
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- FastAPI for the excellent Python web framework
-- Next.js team for the React framework
-- OpenAI for AI/ML capabilities
-- The open-source community for various libraries and tools
